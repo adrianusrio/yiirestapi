@@ -2,40 +2,46 @@
 
 namespace app\modules\v1\controllers;
 use Yii;
-use yii\rest\ActiveController;
 use app\components\Controller;
-use yii\web\Response;
+use app\models\DataUser;
+use yii\helpers\Url;
 
 class UserController extends Controller
 {
+    public $modelClass = 'app\models\DataUser';
 
-    public function behaviors()
-    {
+    public function behaviors(){
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['except'] = ['index', 'create', 'update'];
-
+        $behaviors['authenticator']['except'] = ['create'];
         return $behaviors;
     }
 
-
-    public function actionIndex()
+    public function actions()
     {
-        // return $this->render('index');
-        // die('asd');
-        return $this->apiSuccess();
+        $actions = parent::actions();
+        unset($actions['create']);
+        return $actions;
     }
+
+
+    // public function actionIndex()
+    // {
+    //     // return $this->render('index');
+    //     // die('asd');
+    //     return $this->apiSuccess();
+    // }
 
     public function actionCreate(){
-        // print_r(Yii::$app->request->getBodyParams());
-        \Yii::$app->response->statusCode = 200;
-        return [
-            'statusCode' => 200,
-            'message' => 'Success',
-        ];
-    }
-
-    public function actionUpdate(){
-        return $this->apiSuccess();
+        $model = new DataUser;
+        $data = \Yii::$app->getRequest()->getBodyParams();
+        $model->load($data['data'], '');
+        if ($model->save()) {
+            $response = Yii::$app->getResponse();
+            $response->setStatusCode(201);
+        } elseif (!$model->hasErrors()) {
+            throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+        }
+        return $model;
     }
 
 }

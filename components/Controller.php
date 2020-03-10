@@ -10,7 +10,7 @@ use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\QueryParamAuth;
 use yii\filters\ContentNegotiator;
 
-class Controller extends \yii\rest\Controller
+class Controller extends \yii\rest\ActiveController
 {
     /**
      * @inheritdoc
@@ -18,16 +18,42 @@ class Controller extends \yii\rest\Controller
     public static function allowedDomains() {
         return [
             //'*', // star allows all domains
-            'http://localhost:8080',
-            'http://localhost:3000',
-            'http://localhost',
+            // 'http://localhost:8080',
+            // 'http://localhost:3000',
+            // 'http://localhost',
         ];
     }
 
     public function behaviors()
     {
         $behaviors = parent::behaviors();
+        unset($behaviors['authenticator']);
 
+        $behaviors['contentNegotiator'] = [
+			'class' => ContentNegotiator::className(),
+			'formats' => [
+				'application/json' => Response::FORMAT_JSON,
+			],
+		];
+
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+            // 'cors' => [
+            //     // restrict access to
+            //     'Origin' => ['*', 'https://www.myserver.com'],
+            //     // Allow only POST and PUT methods
+            //     'Access-Control-Request-Method' => ['POST', 'PUT'],
+            //     // Allow only headers 'X-Wsse'
+            //     'Access-Control-Request-Headers' => ['X-Wsse'],
+            //     // Allow credentials (cookies, authorization headers, etc.) to be exposed to the browser
+            //     'Access-Control-Allow-Credentials' => true,
+            //     // Allow OPTIONS caching
+            //     'Access-Control-Max-Age' => 3600,
+            //     // Allow the X-Pagination-Current-Page header to be exposed to the browser.
+            //     'Access-Control-Expose-Headers' => ['X-Pagination-Current-Page'],
+            // ],
+        ];
+        
         $behaviors['authenticator'] = [
             'class' => CompositeAuth::className(),
             'authMethods' => [
@@ -36,23 +62,7 @@ class Controller extends \yii\rest\Controller
                 QueryParamAuth::className(),
             ],
         ];
-
-        $behaviors['contentNegotiator'] = [
-			'class' => ContentNegotiator::className(),
-			'formats' => [
-				'application/json' => Response::FORMAT_JSON,
-			],
-        ];
-        $behaviors['verbs'] = [
-            'class' => \yii\filters\VerbFilter::className(),
-            'actions' => [
-                'index'  => ['GET'],
-                'view'   => ['GET'],
-                'create' => ['POST'],
-                'update' => ['PUT'],
-                'delete' => ['DELETE'],
-            ],
-        ];
+        // $behaviors['authenticator']['except'] = ['options'];
         return $behaviors;
 
     }

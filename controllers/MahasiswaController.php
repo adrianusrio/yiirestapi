@@ -46,7 +46,7 @@ class MahasiswaController extends ActiveController
         // echo $params;
         $model = new DataUser;
         $data = \Yii::$app->getRequest()->getBodyParams();
-        // print_r($data['data']);
+        print_r($data);die;
         $model->load($data['data'], '');
         if ($model->save()) {
             $response = Yii::$app->getResponse();

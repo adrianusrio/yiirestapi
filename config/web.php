@@ -24,6 +24,7 @@ $config = [
                 header("Access-Control-Allow-Origin: *");
             }
         ],
+        
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -64,6 +65,7 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'v1/user','pluralize'=>false],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'mahasiswa'],
             ],
         ],
 
